@@ -50,3 +50,6 @@ Der Schlüssel lässt sich in `app.js` in `getGrade()` leicht ändern.
 
 ## Fachlicher Hinweis
 Der Test vermeidet die pauschale Aussage, es habe überall in den USA zu jeder Zeit dasselbe „Trommelverbot“ gegeben. Er unterscheidet außerdem Spirituals von der späteren Gospel-Tradition.
+
+## Version 3
+Die Positionen der richtigen Antworten sind gleichmäßig auf A, B, C und D verteilt (je 5-mal), ohne einfaches Rotationsmuster.
