@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Musiktest – Anfänge afroamerikanischer Musik</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <p class="eyebrow">Musik · Klasse 9</p>
+      <h1>Anfänge afroamerikanischer Musik</h1>
+      <p>Sklaverei · Work Songs · Spirituals & Gospel · Call and Response · Offbeat/Synkope · Gesangsstil</p>
+    </header>
+
+    <section id="start" class="card">
+      <h2>Test starten</h2>
+      <p>20 Aufgaben · 30 Punkte. Nach der Abgabe erhältst du Punkte, Prozentzahl, Note und Erklärungen.</p>
+      <label>Name oder Kürzel
+        <input id="studentName" maxlength="40" placeholder="z. B. Mia K." autocomplete="off">
+      </label>
+      <button id="startBtn">Test beginnen</button>
+      <p class="small">Hinweis: Wenn Supabase eingerichtet ist, werden Name/Kürzel und Ergebnis dort gespeichert.</p>
+    </section>
+
+    <form id="quiz" class="hidden"></form>
+    <section id="result" class="hidden"></section>
+
+    <footer>
+      <p>Historisch vereinfachte Lernkontrolle für Klasse 9. „Spiritual“ und „Gospel“ werden zeitlich unterschieden; Einschränkungen von Trommeln werden nicht als überall identisches Verbot dargestellt.</p>
+    </footer>
+  </main>
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

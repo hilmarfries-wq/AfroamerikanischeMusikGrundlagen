@@ -1,0 +1,11 @@
+*{box-sizing:border-box} :root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#191919;background:#f3efe7}
+body{margin:0}.wrap{max-width:900px;margin:auto;padding:24px}.hero{padding:34px 0 18px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-weight:800;font-size:.8rem}
+h1{font-size:clamp(2rem,6vw,4rem);line-height:1;margin:.15em 0}.card,.question,#result{background:white;border:1px solid #ddd5c7;border-radius:18px;padding:22px;margin:16px 0;box-shadow:0 8px 24px #0000000b}
+label{display:block;font-weight:700;margin:16px 0}input{width:100%;padding:12px;border:1px solid #aaa;border-radius:10px;font:inherit;margin-top:6px}
+button{border:0;border-radius:12px;padding:12px 18px;font:inherit;font-weight:800;cursor:pointer;background:#181818;color:white}button:hover{opacity:.88}
+.hidden{display:none}.question h3{margin-top:0}.choice{display:flex;gap:10px;align-items:flex-start;padding:8px 0;font-weight:500}.choice input{width:auto;margin-top:4px}
+.actions{position:sticky;bottom:12px;background:#f3efe7e8;backdrop-filter:blur(8px);padding:12px;border-radius:16px;display:flex;justify-content:space-between;align-items:center}
+.score{font-size:1.25rem;font-weight:800}.grade{font-size:4rem;font-weight:900;margin:.1em 0}.correct{border-left:6px solid #2e7d32}.wrong{border-left:6px solid #b3261e}
+.explanation{background:#f7f7f7;border-radius:10px;padding:12px;margin-top:10px}.small,footer{font-size:.88rem;color:#555}footer{padding:28px 4px}
+.progress{font-weight:700}.tag{display:inline-block;padding:5px 9px;background:#eee;border-radius:999px;font-size:.8rem;margin-bottom:8px}
+@media(max-width:600px){.wrap{padding:15px}.card,.question,#result{padding:17px}.actions{flex-direction:column;gap:10px;align-items:stretch}}
