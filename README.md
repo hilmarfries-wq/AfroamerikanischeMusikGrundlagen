@@ -4,6 +4,7 @@ Fertige statische Web-App für GitHub Pages + optional Supabase.
 
 ## Enthalten
 - 20 Aufgaben / 30 Punkte
+- Antwortmöglichkeiten bewusst ähnlich lang formuliert, damit die richtige Lösung nicht am Schriftbild erkennbar ist
 - automatische Punkte-, Prozent- und Notenberechnung
 - 50–51,9 % = 4−
 - Erklärung zu jeder Aufgabe
