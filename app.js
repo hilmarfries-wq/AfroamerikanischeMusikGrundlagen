@@ -97,48 +97,142 @@ async function saveResult(row){
     });
     if(!r.ok) console.warn("Supabase:",await r.text());
   }catch(err){console.warn("Ergebnis konnte nicht gespeichert werden.",err)}
-}\n\n// Lehrerbereich: Supabase Auth + RLS\nlet teacherClient=null;\nasync function initTeacherArea(){if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){document.querySelector('#loginMessage').textContent='Supabase ist noch nicht in config.js eingerichtet.';return;}try{const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');teacherClient=createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);const {data}=await teacherClient.auth.getSession();if(data.session)await showTeacherPanel(data.session.user);teacherClient.auth.onAuthStateChange(async(event,session)=>{if(event==='SIGNED_IN'&&session)await showTeacherPanel(session.user);if(event==='SIGNED_OUT')showTeacherLogin();});}catch(e){document.querySelector('#loginMessage').textContent='Lehrerbereich konnte nicht geladen werden.';}}\ndocument.querySelector('#teacherLoginBtn').addEventListener('click',async()=>{if(!teacherClient)return;const email=document.querySelector('#teacherEmail').value.trim(),password=document.querySelector('#teacherPassword').value,msg=document.querySelector('#loginMessage');msg.textContent='Anmeldung läuft …';const {data,error}=await teacherClient.auth.signInWithPassword({email,password});if(error){msg.textContent='Anmeldung fehlgeschlagen. E-Mail/Passwort oder Lehrerfreigabe prüfen.';return;}await showTeacherPanel(data.user);});\ndocument.querySelector('#teacherLogoutBtn').addEventListener('click',async()=>{if(teacherClient)await teacherClient.auth.signOut();});\nasync function showTeacherPanel(user){document.querySelector('#teacherLogin').classList.add('hidden');document.querySelector('#teacherPanel').classList.remove('hidden');document.querySelector('#teacherIdentity').textContent=`Angemeldet als ${user.email||'Lehrer'}`;await loadTeacherResults();}\nfunction showTeacherLogin(){document.querySelector('#teacherPanel').classList.add('hidden');document.querySelector('#teacherLogin').classList.remove('hidden');document.querySelector('#teacherPassword').value='';}\nasync function loadTeacherResults(){const body=document.querySelector('#resultsBody'),msg=document.querySelector('#teacherMessage');body.innerHTML='';msg.textContent='Ergebnisse werden geladen …';const {data,error}=await teacherClient.from('test_results').select('created_at,student_name,points,max_points,percent,grade').order('created_at',{ascending:false});if(error){msg.textContent='Kein Zugriff. Prüfe teacher_users und die RLS-Regeln aus supabase-v4.sql.';return;}if(!data.length){msg.textContent='Noch keine Ergebnisse gespeichert.';return;}body.innerHTML=data.map(r=>`<tr><td>${new Date(r.created_at).toLocaleString('de-DE')}</td><td>${esc(r.student_name)}</td><td>${r.points}/${r.max_points}</td><td>${r.percent}</td><td><strong>${esc(r.grade)}</strong></td></tr>`).join('');msg.textContent=`${data.length} Ergebnis(se)`;}\ninitTeacherArea();\n// --- Lehrerbereich V4.1: ohne externe JS-Bibliothek ---
-let teacherToken=sessionStorage.getItem("teacherToken")||"";
-let teacherMail=sessionStorage.getItem("teacherMail")||"";
-const $=s=>document.querySelector(s);
-function h(token=""){const x={"apikey":cfg.SUPABASE_ANON_KEY,"Content-Type":"application/json"};if(token)x.Authorization=`Bearer ${token}`;return x}
+}
 
-async function loginTeacher(){
- const msg=$("#loginMessage"), email=$("#teacherEmail").value.trim(), password=$("#teacherPassword").value;
- if(!cfg.SUPABASE_URL||!cfg.SUPABASE_ANON_KEY){msg.textContent="Supabase ist in config.js noch nicht eingerichtet.";return}
- if(!email||!password){msg.textContent="Bitte E-Mail und Passwort eingeben.";return}
- msg.textContent="Anmeldung läuft …";
- try{
-  const r=await fetch(`${cfg.SUPABASE_URL}/auth/v1/token?grant_type=password`,{method:"POST",headers:h(),body:JSON.stringify({email,password})});
-  const x=await r.json();
-  if(!r.ok||!x.access_token){msg.textContent="Anmeldung fehlgeschlagen. E-Mail/Passwort prüfen.";return}
-  teacherToken=x.access_token; teacherMail=x.user?.email||email;
-  sessionStorage.setItem("teacherToken",teacherToken);sessionStorage.setItem("teacherMail",teacherMail);
-  await showTeacher();
- }catch(e){msg.textContent="Verbindung zu Supabase fehlgeschlagen."}
+// --- Lehrerbereich V4.2 ---
+let teacherToken = sessionStorage.getItem("teacherToken") || "";
+let teacherMail = sessionStorage.getItem("teacherMail") || "";
+
+function teacherHeaders(token = "") {
+  const headers = {
+    "apikey": cfg.SUPABASE_ANON_KEY,
+    "Content-Type": "application/json"
+  };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  return headers;
 }
-async function showTeacher(){
- $("#teacherLogin").classList.add("hidden");$("#teacherPanel").classList.remove("hidden");
- $("#teacherIdentity").textContent=`Angemeldet als ${teacherMail||"Lehrer"}`;
- await loadResults();
+
+async function loginTeacher() {
+  const email = document.querySelector("#teacherEmail").value.trim();
+  const password = document.querySelector("#teacherPassword").value;
+  const msg = document.querySelector("#loginMessage");
+
+  if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) {
+    msg.textContent = "Supabase ist in config.js noch nicht eingerichtet.";
+    return;
+  }
+  if (!email || !password) {
+    msg.textContent = "Bitte E-Mail und Passwort eingeben.";
+    return;
+  }
+
+  msg.textContent = "Anmeldung läuft …";
+
+  try {
+    const response = await fetch(
+      `${cfg.SUPABASE_URL}/auth/v1/token?grant_type=password`,
+      {
+        method: "POST",
+        headers: teacherHeaders(),
+        body: JSON.stringify({ email, password })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.access_token) {
+      msg.textContent = "Anmeldung fehlgeschlagen. E-Mail und Passwort prüfen.";
+      return;
+    }
+
+    teacherToken = data.access_token;
+    teacherMail = data.user?.email || email;
+    sessionStorage.setItem("teacherToken", teacherToken);
+    sessionStorage.setItem("teacherMail", teacherMail);
+    msg.textContent = "";
+    await showTeacherPanel();
+  } catch (error) {
+    msg.textContent = "Verbindung zu Supabase fehlgeschlagen.";
+  }
 }
-function logoutTeacher(){
- teacherToken="";teacherMail="";sessionStorage.removeItem("teacherToken");sessionStorage.removeItem("teacherMail");
- $("#teacherPanel").classList.add("hidden");$("#teacherLogin").classList.remove("hidden");$("#teacherPassword").value="";
- $("#loginMessage").textContent="Abgemeldet.";
+
+async function showTeacherPanel() {
+  document.querySelector("#teacherLogin").classList.add("hidden");
+  document.querySelector("#teacherPanel").classList.remove("hidden");
+  document.querySelector("#teacherIdentity").textContent =
+    `Angemeldet als ${teacherMail || "Lehrer"}`;
+  await loadTeacherResults();
 }
-async function loadResults(){
- const body=$("#resultsBody"),msg=$("#teacherMessage");body.innerHTML="";msg.textContent="Ergebnisse werden geladen …";
- try{
-  const r=await fetch(`${cfg.SUPABASE_URL}/rest/v1/test_results?select=created_at,student_name,points,max_points,percent,grade&order=created_at.desc`,{headers:h(teacherToken)});
-  if(r.status===401){logoutTeacher();$("#loginMessage").textContent="Sitzung abgelaufen. Bitte erneut anmelden.";return}
-  const data=await r.json();
-  if(!r.ok){msg.textContent="Kein Zugriff. Bitte teacher_users/RLS prüfen.";return}
-  if(!data.length){msg.textContent="Noch keine Ergebnisse gespeichert.";return}
-  body.innerHTML=data.map(r=>`<tr><td>${new Date(r.created_at).toLocaleString("de-DE")}</td><td>${esc(r.student_name)}</td><td>${r.points}/${r.max_points}</td><td>${r.percent}</td><td><strong>${esc(r.grade)}</strong></td></tr>`).join("");
-  msg.textContent=`${data.length} Ergebnis(se)`;
- }catch(e){msg.textContent="Ergebnisse konnten nicht geladen werden."}
+
+function logoutTeacher() {
+  teacherToken = "";
+  teacherMail = "";
+  sessionStorage.removeItem("teacherToken");
+  sessionStorage.removeItem("teacherMail");
+  document.querySelector("#teacherPanel").classList.add("hidden");
+  document.querySelector("#teacherLogin").classList.remove("hidden");
+  document.querySelector("#teacherPassword").value = "";
+  document.querySelector("#loginMessage").textContent = "Abgemeldet.";
 }
-$("#teacherLoginBtn")?.addEventListener("click",loginTeacher);
-$("#teacherLogoutBtn")?.addEventListener("click",logoutTeacher);
-if(teacherToken&&cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY)showTeacher();
+
+async function loadTeacherResults() {
+  const body = document.querySelector("#resultsBody");
+  const msg = document.querySelector("#teacherMessage");
+  body.innerHTML = "";
+  msg.textContent = "Ergebnisse werden geladen …";
+
+  try {
+    const url =
+      `${cfg.SUPABASE_URL}/rest/v1/test_results` +
+      `?select=created_at,student_name,points,max_points,percent,grade` +
+      `&order=created_at.desc`;
+
+    const response = await fetch(url, {
+      headers: teacherHeaders(teacherToken)
+    });
+
+    if (response.status === 401) {
+      logoutTeacher();
+      document.querySelector("#loginMessage").textContent =
+        "Sitzung abgelaufen. Bitte erneut anmelden.";
+      return;
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      msg.textContent =
+        "Kein Zugriff auf Ergebnisse. Bitte teacher_users und RLS prüfen.";
+      return;
+    }
+
+    if (!data.length) {
+      msg.textContent = "Noch keine Ergebnisse gespeichert.";
+      return;
+    }
+
+    body.innerHTML = data.map(r => `
+      <tr>
+        <td>${new Date(r.created_at).toLocaleString("de-DE")}</td>
+        <td>${esc(r.student_name)}</td>
+        <td>${r.points}/${r.max_points}</td>
+        <td>${r.percent}</td>
+        <td><strong>${esc(r.grade)}</strong></td>
+      </tr>
+    `).join("");
+
+    msg.textContent = `${data.length} Ergebnis(se)`;
+  } catch (error) {
+    msg.textContent = "Ergebnisse konnten nicht geladen werden.";
+  }
+}
+
+document.querySelector("#teacherLoginBtn")
+  .addEventListener("click", loginTeacher);
+
+document.querySelector("#teacherLogoutBtn")
+  .addEventListener("click", logoutTeacher);
+
+if (teacherToken && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY) {
+  showTeacherPanel();
+}

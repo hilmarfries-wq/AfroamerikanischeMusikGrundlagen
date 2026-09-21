@@ -9,4 +9,9 @@ button{border:0;border-radius:12px;padding:12px 18px;font:inherit;font-weight:80
 .explanation{background:#f7f7f7;border-radius:10px;padding:12px;margin-top:10px}.small,footer{font-size:.88rem;color:#555}footer{padding:28px 4px}
 .progress{font-weight:700}.tag{display:inline-block;padding:5px 9px;background:#eee;border-radius:999px;font-size:.8rem;margin-bottom:8px}
 @media(max-width:600px){.wrap{padding:15px}.card,.question,#result{padding:17px}.actions{flex-direction:column;gap:10px;align-items:stretch}}
-.teacher-card{margin-top:38px}.teacher-head{display:flex;justify-content:space-between;gap:16px;align-items:center}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{text-align:left;padding:10px;border-bottom:1px solid #ddd5c7;white-space:nowrap}th{font-size:.85rem;text-transform:uppercase;letter-spacing:.04em}
+.teacher-card{margin-top:38px}
+.teacher-head{display:flex;justify-content:space-between;gap:16px;align-items:center}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #ddd5c7;white-space:nowrap}
+th{font-size:.85rem;text-transform:uppercase;letter-spacing:.04em}
