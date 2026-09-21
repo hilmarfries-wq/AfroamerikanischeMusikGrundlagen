@@ -26,6 +26,8 @@
 
     <form id="quiz" class="hidden"></form>
     <section id="result" class="hidden"></section>
+<section id="teacherLogin" class="card teacher-card"><h2>Lehrerbereich</h2><p>Geschützter Zugriff auf die gespeicherten Testergebnisse.</p><label>E-Mail<input id="teacherEmail" type="email" autocomplete="username"></label><label>Passwort<input id="teacherPassword" type="password" autocomplete="current-password"></label><button id="teacherLoginBtn" type="button">Lehrer-Login</button><p id="loginMessage" class="small"></p></section>
+<section id="teacherPanel" class="card hidden"><div class="teacher-head"><div><p class="eyebrow">Lehrerbereich</p><h2>Ergebnisse</h2></div><button id="teacherLogoutBtn" type="button">Abmelden</button></div><p id="teacherIdentity" class="small"></p><div class="table-wrap"><table><thead><tr><th>Datum</th><th>Name/Kürzel</th><th>Punkte</th><th>%</th><th>Note</th></tr></thead><tbody id="resultsBody"></tbody></table></div><p id="teacherMessage" class="small"></p></section>
 
     <footer>
       <p>Historisch vereinfachte Lernkontrolle für Klasse 9. „Spiritual“ und „Gospel“ werden zeitlich unterschieden; Einschränkungen von Trommeln werden nicht als überall identisches Verbot dargestellt.</p>
